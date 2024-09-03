@@ -1,0 +1,16 @@
+form {
+  width: 100%;
+  max-width: 700;
+  display: flex;
+  flex-direction: column;
+  background-color: bisque;
+  padding: 20px;
+}
+
+li {
+  text-align: left;
+}
+
+.item--completed {
+  color: red;
+}
