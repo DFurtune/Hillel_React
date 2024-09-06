@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import service from "./../../services/todos";
 import "./ToDoList.css";
-import { stopBubbling } from "../../utils/clickFns";
-import { API } from "../../data/CONSTS";
 
-export default function Todos() {
-  const DEFAULT_NEW_TODO = {
-    title: `Hello, world!`,
-    completed: true,
-  };
-
+function TodosList({ newTodo }) {
   const [todos, setTodos] = useState([]);
-  const [sortedTodos, setSortedTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState(DEFAULT_NEW_TODO);
+  const sortedTodos = useMemo(
+    () => todos.sort((a, b) => b.priority - a.priority),
+    [todos]
+  );
 
   const getTodos = async () => {
-    try {
-      const request = await fetch(API),
-        response = await request.json();
-
-      setTodos(response);
-    } catch (err) {
-      console.log(err);
-    }
+    const response = await service.get();
+    setTodos(response);
   };
 
   useEffect(() => {
@@ -29,121 +19,58 @@ export default function Todos() {
   }, []);
 
   useEffect(() => {
-    setSortedTodos(todos.sort((a, b) => b.completed - a.completed));
-  }, [todos]);
+    if (Object.keys(newTodo).length) getTodos();
+  }, [newTodo]);
 
-  const handleItemDelete = async (id) => {
-    try {
-      await fetch(API + `/${id}`, { method: `DELETE` });
-
-      setTodos((prevState) => prevState.filter((item) => item.id !== id));
-    } catch (err) {
-      console.groupCollapsed(err);
-    }
-  };
-
-  const getListItemClassName = (item) => {
-    const classes = [];
-
-    if (item.completed) classes.push(`item--completed`);
-
+  const getClassName = (item) => {
+    const classes = [`todos__item`];
+    if (item.priority) classes.push(`todos__item--priority`);
+    if (item.active) classes.push(`todos__item--active`);
     return classes.join(` `);
   };
 
-  const handleItemCompleted = async (item) => {
-    try {
-      const request = await fetch(API + `/${item.id}`, {
-          method: `PUT`,
-          body: JSON.stringify({ ...item, completed: !item.completed }),
-          headers: {
-            "Content-type": "application/json",
-          },
-        }),
-        response = await request.json();
+  const handleItemDelete = async (e, id) => {
+    e.stopPropagation();
+    await service.delete(id);
+    getTodos();
+  };
 
-      setTodos((prevState) =>
-        prevState.map((item) => {
-          if (item.id === response.id) item = response;
-          return item;
-        })
-      );
-    } catch (err) {
-      console.log(err);
+  const handleChangePriority = async (e, item) => {
+    e.stopPropagation();
+    await service.put(item.id, { ...item, priority: !item.priority });
+    getTodos();
+  };
+
+  const handleItemActive = async (item) => {
+    if (item.active) {
+      delete item.active;
+    } else {
+      item.active = true;
     }
+
+    await service.put(item.id, item);
+    getTodos();
   };
 
-  const handleNewTodoTitle = (event) => {
-    setNewTodo((prevState) => ({ ...prevState, title: event.target.value }));
-  };
-
-  const handleNewTodoCompleted = (event) => {
-    setNewTodo((prevState) => ({
-      ...prevState,
-      completed: event.target.checked,
-    }));
-  };
-
-  const handleNewTodoSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      const request = await fetch(API, {
-          method: `POST`,
-          body: JSON.stringify(newTodo),
-          headers: {
-            "Content-type": "application/json",
-          },
-        }),
-        response = await request.json();
-
-      getTodos();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  return (
-    <>
-      <form className="todos__form" onSubmit={handleNewTodoSubmit}>
-        <label>
-          Title:{" "}
-          <input
-            type="text"
-            defaultValue={newTodo.title}
-            onChange={handleNewTodoTitle}
-          />
-        </label>
-        <label>
-          Completed:{" "}
+  return sortedTodos.length ? (
+    <ul>
+      {sortedTodos.map((item) => (
+        <li
+          key={item.id}
+          className={getClassName(item)}
+          onClick={() => handleItemActive(item)}
+        >
+          {item.title}{" "}
+          <button onClick={(e) => handleItemDelete(e, item.id)}>Delete</button>{" "}
           <input
             type="checkbox"
-            defaultChecked={newTodo.completed}
-            onChange={handleNewTodoCompleted}
+            defaultChecked={item.priority}
+            onChange={(e) => handleChangePriority(e, item)}
           />
-        </label>
-        <button>Add new todo</button>
-      </form>
-
-      {sortedTodos.length ? (
-        <ol>
-          {sortedTodos.map((item) => (
-            <li
-              className={getListItemClassName(item)}
-              key={item.id}
-              onClick={() => handleItemCompleted(item)}
-            >
-              {item.title}{" "}
-              <button
-                onClick={(event) =>
-                  stopBubbling(event, () => handleItemDelete(item.id))
-                }
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ol>
-      ) : null}
-    </>
-  );
+        </li>
+      ))}
+    </ul>
+  ) : null;
 }
+
+export default TodosList;

@@ -1,12 +1,13 @@
 import "./App.css";
-import ToDoList from "./components/ToDoList/ToDoList";
+import Todos from "./components/Todos/Todos";
 
-function App() {
+export default function App() {
+  const liftedNewTodo = (item) => {
+    console.log(`in App`, item);
+  };
   return (
     <>
-      <ToDoList />
+      <Todos liftingNewTodoToApp={liftedNewTodo} />
     </>
   );
 }
-
-export default App;

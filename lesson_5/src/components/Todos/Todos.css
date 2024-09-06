@@ -1,0 +1,19 @@
+.todos__item--priority {
+  color: crimson;
+  font-weight: bold;
+}
+
+.todos__item--active {
+  background: lightgreen;
+}
+.todos__form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: fit-content;
+  border: 1px solid black;
+}
+.todos__form label {
+  margin-bottom: 10px;
+}
