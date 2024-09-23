@@ -1,0 +1,57 @@
+.countries-list {
+  margin-top: 20px;
+}
+
+.countries-list ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.countries-list li {
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: calc(33.333% - 20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+}
+
+.countries-list li:hover {
+  transform: translateY(-5px);
+}
+
+.countries-list li .country-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.countries-list li .country-info a {
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+.countries-list li button {
+  background-color: #e74c3c;
+}
+
+.countries-list li button:hover {
+  background-color: #c0392b;
+}
+
+/* Адаптивність */
+@media (max-width: 900px) {
+  .countries-list li {
+    width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 600px) {
+  .countries-list li {
+    width: 100%;
+  }
+}

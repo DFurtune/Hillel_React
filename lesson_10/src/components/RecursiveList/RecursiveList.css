@@ -1,0 +1,12 @@
+.recursive-list ul {
+  list-style: disc inside;
+  padding-left: 20px;
+}
+
+.recursive-list li {
+  margin-bottom: 5px;
+}
+
+.recursive-list strong {
+  color: #2c3e50;
+}

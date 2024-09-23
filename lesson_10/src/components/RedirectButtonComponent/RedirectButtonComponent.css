@@ -1,0 +1,13 @@
+.redirect-button {
+  padding: 10px 20px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.redirect-button:hover {
+  background-color: #1c5980;
+}
